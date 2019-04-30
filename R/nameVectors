@@ -6,10 +6,14 @@ require(ape)
 
 nameVectors<-function(data, vectors){
   n<-length(vectors)
+  names<-colnames(data[,vectors])
   output<-vector(mode="list", length=n)
+  names(output)<-names
   for (i in 1:n){
-    vector.out<-data[,i]
+    vector.out<-data[,vectors[i]]
     names(vector.out)<-rownames(data)
+    vector.out<-vector.out[!is.na(vector.out)]
     output[[i]]<-vector.out
   }
+  return(output)
 }
