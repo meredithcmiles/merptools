@@ -1,0 +1,15 @@
+# for instances where pruneTo() is not practical, use this instead
+# supply your named data.frame and the columns you'd like to extract
+# simply returns a named list of vectors for later handling
+
+require(ape)
+
+nameVectors<-function(data, vectors){
+  n<-length(vectors)
+  output<-vector(mode="list", length=n)
+  for (i in 1:n){
+    vector.out<-data[,i]
+    names(vector.out)<-rownames(data)
+    output[[i]]<-vector.out
+  }
+}
