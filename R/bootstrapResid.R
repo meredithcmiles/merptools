@@ -16,7 +16,5 @@ bootstrapResid<-function(y, x){
     r<-rstandard(lm(y1~x1))
     out[,i]<-r
   }
-  
-  return(bootstrapTrait(out))
-  
+  return(out)
 }
