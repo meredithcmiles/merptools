@@ -2,10 +2,10 @@
 # returns data in identical structure as bootstrapTrait()
 
 bootstrapResid<-function(y, x){
-  y<-y[complete.cases(y),]
-  x<-x[complete.cases(x),]
+  y<-y[complete.cases(y), ]
+  x<-x[complete.cases(x), ]
   
-  x<-x[-which(rownames(x) %in% rownames(y) == FALSE),]
+  x<-x[-which(rownames(x) %in% rownames(y) == FALSE), ]
   y<-y[-which(rownames(y) %in% rownames(x) == FALSE), ]
   
   out<-matrix(NA, nrow=nrow(y), ncol=ncol(y))
