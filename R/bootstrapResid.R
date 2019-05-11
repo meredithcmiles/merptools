@@ -1,5 +1,5 @@
 # compute standardized residuals from 2 bootstrapped trait datasets
-# returns data in identical structure as binarize
+# returns data in identical structure as bootstrapTrait()
 
 bootstrapResid<-function(y, x){
   y<-y[complete.cases(y),]
@@ -17,6 +17,6 @@ bootstrapResid<-function(y, x){
     out[,i]<-r
   }
   
-  return(binarize(out))
+  return(bootstrapTrait(out))
   
 }
