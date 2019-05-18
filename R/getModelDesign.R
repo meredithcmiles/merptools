@@ -13,25 +13,19 @@ getModelDesign<-function(x){
   n<-max(info$rPar)
   
   ratenames<-paste("q", info[,1], info[,2], sep="")
-  est<-which(is.na(info[,3]))
-  parnames<-paste("q", info[est,1], info[est,2], sep="")
-  parloc<-matrix(c(info[est,1], info[est,2]), ncol=2)
+  valnames<-paste("q", info$rVal, info$cVal, sep="")
   
-  adj<-matrix(nrow=n, ncol=n)
-  diag(adj)<-0
+  freepar<-ratenames[ratenames %in% valnames]
   
-  for (i in 1:nrow(info)){
-    
-    x = info[i,1]
-    y = info[i,2]
-    
-    if (is.na(info[i,3])==TRUE){
-      adj[x,y]<-ratenames[i]
-    } else if (info[i,3]==0){
-      adj[x,y]<-0
-    } else {
-      adj[x,y]<-paste("q", info[i,3], info[i,4], sep="")
-    }
-  }
+  parnames<-levels(as.factor(ratenames))
+  
+  zeroes<-which(is.na(info[,3]))
+  nonzero<-which(!is.na(info[,3]))
+  
+  valnames[zeroes]<-NA
+  valnames<-as.factor(valnames)
+  
+  adj<-matrix(valnames, nrow=n, ncol=n)
+
   return(adj)
 }
