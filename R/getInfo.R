@@ -27,6 +27,8 @@ getInfo<-function(file, states=NULL){
   x1<-as.numeric(substr(readin$val, 2, 2)) # parameter definition pt. 1
   x2<-as.numeric(substr(readin$val, 3, 3)) # parameter definition pt. 2
   
+  npar <- length(x)
+  
   nstate<-max(as.numeric(x))
   nrate<-(npar^2)-npar
   
