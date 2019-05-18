@@ -22,10 +22,18 @@ getModelDesign<-function(x){
   zeroes<-which(is.na(info[,3]))
   nonzero<-which(!is.na(info[,3]))
   
-  valnames[zeroes]<-NA
-  valnames<-as.factor(valnames)
+  adj<-matrix(NA, nrow=n, ncol=n)
   
-  adj<-matrix(valnames, nrow=n, ncol=n)
-
+  upper<-which(info$rPar < info$cPar)
+  lower<-which(info$rPar > info$cPar)
+  
+  valnames[zeroes]<-NA
+  
+  for (i in 1:length(valnames)){
+    x<-info$rPar[i]
+    y<-info$cPar[i]
+    
+    adj[x,y]<-valnames[i]
+  }
   return(adj)
 }
