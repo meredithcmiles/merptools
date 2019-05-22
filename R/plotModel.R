@@ -1,73 +1,70 @@
 # reads BayesTraits .Log file and plots parameterization
 # plot is written to file
 
-plotModel<-function(x, plotname=NULL, format=".svg"){
+plotModel = function(info){
   
-  if (is.matrix(x)==TRUE){
-    stop("Just supply the .Log file or info file. I'll call the getModelDesign function.")
-  } else if (is.data.frame(x)==TRUE) {
-    info <- x
-  } else if (is.character(x)==TRUE) {
-    info <- getInfo(x)
-  }
-  
-  if (is.null(plotname)==TRUE){
-    plotname<-paste("modelPlot","-", sample(1:10000, size=1), "_", Sys.Date(), format, sep="")
-  } else {
-    plotname <- paste(plotname,"_", Sys.Date(), format, sep="")
-  }
-  
-  nstates<-max(info$rPar)
-  nrates<-nrow(info)
-  npar<-(nstates^2) - nstates
-  parnames<-levels(as.factor(model))
-  
-  model<-getModelDesign(x)
+  nstates = max(info$rPar)
+  nrates = nrow(info)
+
+  model = getModel(info)
+  parnames = levels(as.factor(model))
+  npar_unique = length(parnames)
   
   colopts<-c("#ffa270", "#f4cc66", "#8de8ce", "#5cbcbc", "#b8a9ce", "#8478c9", "#a5a5a5", "#d1d1d1", "#85b267", "#c5e8ae")
-  cols<-colopts[1:npar]
+  tcols<-colopts[1:npar_unique]
   
-  rcol<-rev(info$cPar)
+  r = nrow(model)
+  c = ncol(model)
   
-  svg(plotname, width=5, height=5, pointsize=4)
+  rows = matrix(rep(1:r, times = c), nrow = r, ncol = c)
+  cols = matrix(rep(rev(1:c), times = r), nrow = r, ncol = c, byrow = TRUE)
+  c.names = matrix(rep(1:c, times = r), nrow = r, ncol = c, byrow = TRUE)
   
-  plot(NULL, ylim=c(0,nstates), xlim=c(0,nstates), axes = FALSE, xlab=NA, ylab=NA)
+  xmax = vector(mode="numeric", length = length(model))
+  xmax[1:length(xmax)] = NA
   
-  diag.xmin<-c(0:(nstates-1))
-  diag.ymin<-rev(diag.xmin)
+  plotpars = data.frame("xmax" = xmax, "xmin" = xmax, "xmid" = xmax,
+                        "ymax" = xmax, "ymin" = xmax, "ymid" = xmax,
+                        "col" = xmax, "name" = paste("q", c.names, rows, sep=""))
   
-  diag.xmax<-c(1:nstates)
-  diag.ymax<-rev(diag.xmax)
-  
-  rect(diag.xmin, diag.ymin, diag.xmax, diag.ymax, col="black")
-  
-  
-  for (i in 1:nrates){
-    rowind<-info$rPar[i]
-    colind<-rcol[i]
-    parname<-model[i]
+  for (i in 1:length(model)){
+    
+    xmax = rows[i]
+    ymax = cols[i]
+    
+    xmin = xmax-1
+    ymin = ymax-1
+    
+    xmid = xmin + ((xmax-xmin)/2)
+    ymid = ymin + ((ymax-ymin)/2)
+    
+    parname = model[i]
     
     if (is.na(parname)==TRUE){
       parcol<-"black"
     } else {
-      parcol<-cols[match(parname, parnames)]
+      parcol<-tcols[match(parname, parnames)]
     }
     
-    xmax <- rowind
-    ymax <- colind
-    
-    xmin <- rowind-1
-    ymin <- colind-1
-    
-    xmid <- (xmax - xmin)/2
-    ymid <- (ymax - ymin)/2
-    
-    rect(xmin, ymin, xmax, ymax, col=parcol)
-    
-    
+    plotpars[i,1:(ncol(plotpars)-1)] = c(xmax, xmin, xmid, ymax, ymin, ymid, parcol)
     
   }
   
-  dev.off()
+  plotpars[,1:6] = apply(plotpars[,1:6], 2, as.numeric)
   
+  textpars = plotpars[which(plotpars$col != "black"),]
+  names = as.character(textpars$name)
+  
+  plot(NULL, ylim=c(0,nstates), xlim=c(0,nstates), axes = FALSE, xlab=NA, ylab=NA)
+  
+  rect(plotpars$xmin, plotpars$ymin, plotpars$xmax, plotpars$ymax, col=plotpars$col)
+  
+  for (i in 1:nrow(textpars)){
+    x = textpars$xmid[i]
+    y = textpars$ymid[i]
+    text = textpars$name[i]
+
+    text(x = x, y = y, labels = text)
+        
+  }
 }
