@@ -1,6 +1,7 @@
 # detect and extract parameter intro from BayesTraits MCMC .Log files
 
 getInfo<-function(file, states=NULL){
+  
   # raw output for the MCMC starts on line 25
   skp<-25
   # we'll use line length as a clue to find where to read
@@ -9,17 +10,25 @@ getInfo<-function(file, states=NULL){
   # the last line of rate definitions occurs right before
   # the only line with exactly 18 characters in it
   end<-which(tmplen==18)-1
-  n = end - skp
+  n = skp + end
 
   # now we can read only the relevant information
-  readin<-read.table(file, skip=25, header=FALSE,
-                     nrows = n, col.names=c("par", "val"),
-                     colClasses=c("character", "character"))
+  readin<-readLines(file, n = n)[26:end]
   
-  for(i in nrow(readin)){
+  if(readin[1]=="Restrictions:"){
+    readin = readin[-1]
+  }
+  
+  readin = trimws(readin, which="both")
+  
+  x = substr(readin, start=1, stop=3)
+  y = trimws(substr(readin, start=4, stop=max(str_length(readin))), which="both")
+  
+  readin = data.frame("par" = x, "val" = y)
+  
+  for(i in 1:length(readin)){
     
-    if(readin[i,2] %in% c("None", "0.000000")==FALSE){
-      
+    if(readin[i,2] %in% c("RJ MCMC", "None", "0.000000")==FALSE){
       par.i = readin[i,1]
       val.i = readin[i,2]
       
@@ -27,20 +36,10 @@ getInfo<-function(file, states=NULL){
       par.eq = as.vector(eq[1])
       val.eq = as.vector(eq[2])
       
-      eq.check = as.vector(val.i == par.eq)
-      
-      if(eq.check == FALSE){
-        while(eq.check == FALSE){
-          eq = as.matrix(readin[which(readin[,1]==val.eq),])
-          par.eq = as.vector(eq[1])
-          val.eq = as.vector(eq[2])
-          
-          eq.check = val.eq == "None"
-        }
-        
+      if(val.eq == "None"){
         readin[i,2] = par.eq
-        
-      }
+        readin[which(readin[,2]==par.i),2] = par.eq
+      } 
       
     }
     
@@ -48,6 +47,8 @@ getInfo<-function(file, states=NULL){
 
   # replace free parameters with their id
   readin$val[which(readin$val=="None")] <- readin$par[which(readin$val=="None")]
+  readin$val[which(readin$val=="RJ MCMC")] <- readin$par[which(readin$val=="RJ MCMC")]
+  
   # encode zero parameters as missing data
   readin$val[which(readin$val=="0.000000")] <- NA
 
