@@ -19,7 +19,7 @@ runbt = function(data, tree, files, models){
         vec.out = lh
         
       } else if(i < ncol(data) & j < length(models)){
-      
+        
         lh = bayestraits(dat, tree, cmd[-4], remove_files = FALSE)$Log$results$Lh
         vec.out = c(vec.out, lh)
         
@@ -31,13 +31,13 @@ runbt = function(data, tree, files, models){
       
       if (j==1){
         
-      l1 = paste("Model ", j, ", Iteration ", i, sep="")
-      l2 = paste("Running Lh0 = ", mean(vec.out), sep="")
-
-      cat(l1, "\n", l2, "\n")
-      
+        l1 = paste("Model ", j, ", Iteration ", i, sep="")
+        l2 = paste("Running Lh0 = ", mean(vec.out), sep="")
+        
+        cat(l1, "\n", l2, "\n")
+        
       } else {
-       
+        
         if (i == 1){
           
           x2 = 2*(vec.out[i]-out[i,1])
@@ -54,7 +54,7 @@ runbt = function(data, tree, files, models){
           l2 = paste("Running X2 = ", mean(x2),sep="")
           
           cat(l1, "\n", l2, "\n")
-                      
+          
         }
         
       }
@@ -79,7 +79,7 @@ runbt = function(data, tree, files, models){
       } else {
         
         x2.out = cbind(x2.out, x2)
-        colnames(x2.out)[j] = models[j]
+        colnames(x2.out)[j-1] = models[j]
         
       }
       
