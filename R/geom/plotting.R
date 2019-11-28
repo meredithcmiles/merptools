@@ -64,7 +64,7 @@ if(mode %in% c("sides", "hypotenuse")){
   }
   
   if(sides[1] + sides[2] <= sides[3]){
-    stop('Sum of 2 short sides must be GREATER than the longest side')
+    warning('Sum of 2 short sides must be GREATER than the longest side')
   }
   
  if (orient == 2){
@@ -122,12 +122,11 @@ if(mode %in% c("sides", "hypotenuse")){
   
   Psides <- list("x" = side.x, "y" = side.y, "z" = side.z)
   
-  if(plot){
-    
     if(!add){
       blankplot(xlim = lims.x, ylim = lims.y)
     }
     
+  if(plot){
     for (i in 1:3){
       p <- Psides[[i]]
       segments(p[1], p[2], p[3], p[4])
